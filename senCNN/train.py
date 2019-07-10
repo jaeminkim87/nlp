@@ -72,7 +72,6 @@ def main():
         tr_acc = 0
         model.train()
         for step, mb in tqdm(enumerate(tr_dl), desc='steps', total=len(tr_dl)):
-            print(mb)
             x_mb, y_mb = map(lambda elm: elm.to(device), mb)
 
             opt.zero_grad()
@@ -94,32 +93,32 @@ def main():
                 #                             'val': val_loss}, epoch * len(tr_dl) + step)
                 model.train()
 
-            else:
-                tr_loss /= (step + 1)
-                tr_acc /= (step + 1)
+        else:
+            tr_loss /= (step + 1)
+            tr_acc /= (step + 1)
 
-                tr_summ = {'loss': tr_loss, 'acc': tr_acc}
-                val_summ = evaluate(model, val_dl, {'loss': loss_fn, 'acc': acc}, device)
-                scheduler.step(val_summ['loss'])
-                tqdm.write('epoch : {}, tr_loss: {:.3f}, val_loss: '
-                           '{:.3f}, tr_acc: {:.2%}, val_acc: {:.2%}'.format(epoch + 1, tr_summ['loss'],
-                                                                            val_summ['loss'],
-                                                                            tr_summ['acc'], val_summ['acc']))
+            tr_summ = {'loss': tr_loss, 'acc': tr_acc}
+            val_summ = evaluate(model, val_dl, {'loss': loss_fn, 'acc': acc}, device)
+            scheduler.step(val_summ['loss'])
+            tqdm.write('epoch : {}, tr_loss: {:.3f}, val_loss: '
+                       '{:.3f}, tr_acc: {:.2%}, val_acc: {:.2%}'.format(epoch + 1, tr_summ['loss'],
+                                                                        val_summ['loss'],
+                                                                        tr_summ['acc'], val_summ['acc']))
 
-                val_loss = val_summ['loss']
-                is_best = val_loss < best_val_loss
+            val_loss = val_summ['loss']
+            is_best = val_loss < best_val_loss
 
-                if is_best:
-                    state = {'epoch': epoch + 1,
-                             'model_state_dict': model.state_dict(),
-                             'opt_state_dict': opt.state_dict()}
-                    summary = {'tr': tr_summ, 'val': val_summ}
+            if is_best:
+                state = {'epoch': epoch + 1,
+                         'model_state_dict': model.state_dict(),
+                         'opt_state_dict': opt.state_dict()}
+                summary = {'tr': tr_summ, 'val': val_summ}
 
-                    # manager.update_summary(summary)
-                    # manager.save_summary('summary.json')
-                    # manager.save_checkpoint(state, 'best.tar')
+                # manager.update_summary(summary)
+                # manager.save_summary('summary.json')
+                # manager.save_checkpoint(state, 'best.tar')
 
-                    best_val_loss = val_loss
+                best_val_loss = val_loss
 
 
 if __name__ == '__main__':
