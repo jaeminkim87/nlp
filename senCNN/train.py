@@ -58,7 +58,7 @@ def main():
     val_dl = DataLoader(val_ds, batch_size=args.batch_size)
 
     loss_fn = nn.CrossEntropyLoss()
-    opt = optim.Adam(params=model.parameters(), lr=args.learning_rate)
+    opt = optim.Adadelta(params=model.parameters(), lr=args.learning_rate, rho=0.95, eps=1e-05, weight_decay=5*1e-04)
     scheduler = ReduceLROnPlateau(opt, patience=5)
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     model.to(device)
